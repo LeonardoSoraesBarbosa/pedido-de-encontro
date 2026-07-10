@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Heart, Sparkles, Coffee, Utensils, Stars, Smile } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Heart, Sparkles, Coffee, Smile } from 'lucide-react';
 import { sounds } from '../utils/sound';
 
 interface DatingCalendarProps {
@@ -24,10 +24,12 @@ const TIME_SLOTS = [
 ];
 
 export default function DatingCalendar({ onConfirm, clickedNoFirst }: DatingCalendarProps) {
-  // Current time is 2026-07-08
-  const today = new Date(2026, 6, 8); // July 8th, 2026
+  const [today] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  });
   
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date(2026, 6, 1)); // start on July 2026
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [customNotes, setCustomNotes] = useState<string>('');
@@ -56,7 +58,7 @@ export default function DatingCalendar({ onConfirm, clickedNoFirst }: DatingCale
   const handleDateSelect = (day: number) => {
     const clickedDate = new Date(year, month, day);
     // If before today, do nothing
-    if (clickedDate.getTime() < new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) {
+    if (clickedDate.getTime() < today.getTime()) {
       return;
     }
     setSelectedDate(clickedDate);
@@ -152,7 +154,7 @@ export default function DatingCalendar({ onConfirm, clickedNoFirst }: DatingCale
               }
 
               const thisDate = new Date(year, month, day);
-              const isPast = thisDate.getTime() < new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+              const isPast = thisDate.getTime() < today.getTime();
               const isToday = thisDate.getDate() === today.getDate() && thisDate.getMonth() === today.getMonth() && thisDate.getFullYear() === today.getFullYear();
               const isSelected = selectedDate && 
                                 selectedDate.getDate() === day && 

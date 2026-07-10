@@ -26,6 +26,7 @@ export default function App() {
   const [noOffset, setNoOffset] = useState({ x: 0, y: 0 });
   const [copied, setCopied] = useState(false);
   const [guestName, setGuestName] = useState<string>('');
+  const [inviteLabel, setInviteLabel] = useState<string>('');
   const [dateDetails, setDateDetails] = useState<DateDetails>({
     date: '',
     timeSlot: '',
@@ -46,11 +47,18 @@ export default function App() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const name = params.get('n') || params.get('nome') || params.get('name') || params.get('p') || params.get('convidado');
+      const label = params.get('rotulo') || params.get('r') || params.get('tag') || params.get('label');
       if (name) {
         setGuestName(name.trim());
       }
+      if (label) {
+        setInviteLabel(label.trim());
+      }
     }
   }, []);
+
+  const inviteIdentifier = inviteLabel || guestName;
+  const inviteIdentifierText = inviteIdentifier ? `\n👤 Identificação do convite: ${inviteIdentifier}` : '';
 
   // Dodge function for the "Não" button
   const handleDodgeNoButton = (e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
@@ -91,7 +99,7 @@ export default function App() {
   // Direct WhatsApp sending with user pre-filled text
   const handleWhatsAppRedirect = () => {
     const activityText = dateDetails.notes ? `\n🍕 Plano: ${dateDetails.notes}` : '';
-    const message = `Date confirmado! 🥰\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${activityText}\n\nMal posso esperar! ✨`;
+    const message = `Date confirmado! 🥰${inviteIdentifierText}\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${activityText}\n\nMal posso esperar! ✨`;
     const url = `https://api.whatsapp.com/send?phone=5531996822803&text=${encodeURIComponent(message)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -191,7 +199,7 @@ export default function App() {
     const title = `Date Especial com ${guestName || "você"}`;
     
     const notesText = dateDetails.notes ? `\n🍕 Plano sugerido: ${dateDetails.notes}` : '';
-    const details = `Nosso encontro fofo está confirmado! 🥰\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${notesText}\n\nAnsioso por esse dia! ✨`;
+    const details = `Nosso encontro fofo está confirmado! 🥰${inviteIdentifierText}\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${notesText}\n\nAnsioso por esse dia! ✨`;
     
     // add Leonardo's email as an invitee so Google Calendar prompts the user to send him an invite email
     const guestEmail = "soaresbarbosaleonardo@gmail.com";
@@ -202,7 +210,7 @@ export default function App() {
   // Generate WhatsApp text & copy to clipboard
   const handleCopyInvite = () => {
     const activityText = dateDetails.notes ? `\n🍕 Plano: ${dateDetails.notes}` : '';
-    const inviteText = `Date confirmado! 🥰\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${activityText}\n\nMal posso esperar! ✨`;
+    const inviteText = `Date confirmado! 🥰${inviteIdentifierText}\n\n📅 Data: ${dateDetails.date}\n⏰ Horário: ${dateDetails.timeSlot}${activityText}\n\nMal posso esperar! ✨`;
     
     navigator.clipboard.writeText(inviteText)
       .then(() => {
@@ -441,6 +449,15 @@ export default function App() {
               </div>
 
               <div className="space-y-3 font-sans text-pink-100/90">
+                {inviteIdentifier && (
+                  <div>
+                    <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-pink-300 block">Identificação</span>
+                    <span className="font-bold text-white text-sm md:text-base mt-0.5 block">
+                      {inviteIdentifier}
+                    </span>
+                  </div>
+                )}
+
                 <div>
                   <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-pink-300 block">Dia do Evento</span>
                   <span className="font-bold text-white flex items-center gap-1.5 text-sm md:text-base mt-0.5">
