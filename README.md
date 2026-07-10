@@ -7,9 +7,9 @@ Uma página interativa e divertida para convidar alguém especial para um encont
 **Pré-requisito:** Node.js
 
 1. Instale as dependências:
-   `npm install`
+   `pnpm install`
 2. Rode o projeto:
-   `npm run dev`
+   `pnpm run dev`
 3. Abra o endereço mostrado no terminal.
 
 ## Publicar no GitHub Pages
