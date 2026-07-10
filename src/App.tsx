@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, Sparkles, AlertCircle, Calendar as CalendarIcon, Smile, ShieldAlert, Copy, Check, ArrowRight, RefreshCw, Star, MessageSquare, Mail, Info } from 'lucide-react';
+import { Heart, Sparkles, AlertCircle, Calendar as CalendarIcon, Copy, Check, ArrowRight, RefreshCw, Star, MessageSquare, Info } from 'lucide-react';
 import { AppStep, DateDetails } from './types';
 import { sounds } from './utils/sound';
 import DatingCalendar from './components/DatingCalendar';
@@ -40,10 +40,6 @@ export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [rawSelectedDate, setRawSelectedDate] = useState<Date | null>(null);
-  const [showLinkGenerator, setShowLinkGenerator] = useState(false);
-  const [customInviteName, setCustomInviteName] = useState('');
-  const [generatedLink, setGeneratedLink] = useState('');
-  const [linkCopied, setLinkCopied] = useState(false);
 
   // Parse custom URL parameters to identify guest
   useEffect(() => {
@@ -203,17 +199,6 @@ export default function App() {
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${datesParam}&details=${encodeURIComponent(details)}&add=${encodeURIComponent(guestEmail)}`;
   };
 
-  const handleCopyGeneratedLink = () => {
-    if (!generatedLink) return;
-    navigator.clipboard.writeText(generatedLink)
-      .then(() => {
-        setLinkCopied(true);
-        sounds.playSparkle();
-        setTimeout(() => setLinkCopied(false), 2000);
-      })
-      .catch((err) => console.error('Erro ao copiar link:', err));
-  };
-
   // Generate WhatsApp text & copy to clipboard
   const handleCopyInvite = () => {
     const activityText = dateDetails.notes ? `\n🍕 Plano: ${dateDetails.notes}` : '';
@@ -264,22 +249,6 @@ export default function App() {
           {soundEnabled ? "🔊" : "🔇"}
         </button>
       </div>
-
-      {/* Floating back-to-generator button when previewing as example */}
-      {guestName === "Crush Exemplo" && (
-        <div className="absolute top-4 left-4 z-20">
-          <button
-            onClick={() => {
-              setGuestName('');
-              setStep(AppStep.PROPOSAL);
-              sounds.playSparkle();
-            }}
-            className="px-3.5 py-2 rounded-xl bg-pink-500/20 backdrop-blur-md border border-pink-500/30 text-pink-300 hover:bg-pink-500/30 transition-all text-xs font-bold font-mono uppercase tracking-wider cursor-pointer shadow-sm flex items-center gap-1.5"
-          >
-            <span>⚙️ Voltar ao Gerador</span>
-          </button>
-        </div>
-      )}
 
       {/* Confetti overlay in confirmed screen */}
       {step === AppStep.CONFIRMED && <HeartConfetti />}
@@ -587,105 +556,6 @@ export default function App() {
         )}
 
       </AnimatePresence>
-
-      {/* Link Generator section - Visible only to Leonardo (when no ?n= param is present) */}
-      {!guestName && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 w-full max-w-lg bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg text-center z-10"
-        >
-          <button
-            onClick={() => setShowLinkGenerator(!showLinkGenerator)}
-            className="flex items-center justify-center gap-2 w-full text-xs font-mono font-bold uppercase tracking-wider text-pink-300 hover:text-pink-100 transition-colors cursor-pointer"
-          >
-            <span>{showLinkGenerator ? '🙈 Ocultar Gerador de Convites' : '⚙️ Painel de Convites do Leonardo'}</span>
-            <span className="px-2 py-0.5 rounded bg-pink-500/10 text-pink-200 text-[9px]">
-              {showLinkGenerator ? 'Fechar' : 'Abrir'}
-            </span>
-          </button>
-
-          {showLinkGenerator && (
-            <div className="mt-4 text-left space-y-4 border-t border-pink-500/10 pt-4">
-              <div className="text-[11px] text-pink-200/70 leading-relaxed">
-                Como você é solteiro(a) e quer mandar o convite para pessoas diferentes, use este painel para criar links personalizados. **Uma pessoa nunca saberá o que a outra respondeu**, pois cada link abre um calendário totalmente vazio e privado! 🔒✨
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-[10px] font-mono uppercase font-bold tracking-wider text-pink-300">
-                  Nome do Date / Crush
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customInviteName}
-                    onChange={(e) => {
-                      setCustomInviteName(e.target.value);
-                      if (e.target.value.trim()) {
-                        const origin = typeof window !== 'undefined' ? window.location.origin : '';
-                        setGeneratedLink(`${origin}?n=${encodeURIComponent(e.target.value.trim())}`);
-                      } else {
-                        setGeneratedLink('');
-                      }
-                    }}
-                    placeholder="Ex: Fernanda, Maria..."
-                    className="flex-1 px-3.5 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-pink-500/40 font-medium"
-                  />
-                </div>
-              </div>
-
-              {generatedLink && (
-                <div className="space-y-2 p-3 rounded-xl bg-pink-950/20 border border-pink-500/10">
-                  <span className="block text-[9px] font-mono uppercase font-bold tracking-wider text-pink-300">
-                    Link Personalizado Gerado:
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={generatedLink}
-                      className="flex-1 bg-black/50 text-[11px] font-mono text-pink-100/90 p-2 rounded-lg border border-white/5 select-all outline-none"
-                    />
-                    <button
-                      onClick={handleCopyGeneratedLink}
-                      className="px-3.5 py-2 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-md shrink-0"
-                    >
-                      {linkCopied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Copiado!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copiar</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-pink-300/60 italic">
-                    Copie e envie esse link no WhatsApp da pessoa! Ela verá um convite personalizado com o nome dela. 🥰
-                  </p>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between border-t border-pink-500/10 pt-3">
-                <span className="text-[10px] text-pink-200/40">Quer testar como se fosse ela?</span>
-                <button
-                  onClick={() => {
-                    setGuestName("Crush Exemplo");
-                    setStep(AppStep.PROPOSAL);
-                    sounds.playSparkle();
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-pink-300 text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                >
-                  🎭 Ver como Convidado
-                </button>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      )}
 
       {/* Decorative credit lines at the bottom */}
       <footer className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-[11px] text-pink-400/30 font-mono font-medium tracking-widest uppercase whitespace-nowrap">
