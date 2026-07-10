@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Quicksand", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Fredoka", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe4e6;
+  --color-brand-200: #fecdd3;
+  --color-brand-300: #fda4af;
+  --color-brand-400: #fb7185;
+  --color-brand-500: #f43f5e;
+  --color-brand-600: #e11d48;
+  --color-brand-700: #be123c;
+  
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+/* Custom romantic background grid pattern for Immersive UI */
+.bg-romantic-grid {
+  background-color: #0f0a15;
+  background-image: radial-gradient(rgba(244, 63, 94, 0.15) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+}
